@@ -1,16 +1,18 @@
-import numpy as np
+import torch
+
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
 def init_RBM(p, q):
     return {
-        'W': np.random.normal(0, 0.01, (p, q)),
-        'a': np.zeros(p),
-        'b': np.zeros(q)
+        'W': torch.randn(p, q, device=device) * 0.01,
+        'a': torch.zeros(p, device=device),
+        'b': torch.zeros(q, device=device)
     }
 
 
 def sigmoid(x):
-    return 1 / (1 + np.exp(-x))
+    return torch.sigmoid(x)
 
 
 def entree_sortie_RBM(rbm, X):
@@ -24,35 +26,36 @@ def sortie_entree_RBM(rbm, H):
 def train_RBM(rbm, X, epochs=100, lr=0.1, batch_size=128):
     n = X.shape[0]
     for epoch in range(epochs):
-        indices = np.random.permutation(n)
+        indices = torch.randperm(n)
         for start in range(0, n, batch_size):
-            batch = X[indices[start:start + batch_size]]
-            
+            batch = X[indices[start:start + batch_size]].to(device)
+
             # Positive phase
             ph = entree_sortie_RBM(rbm, batch)
-            h0 = (np.random.rand(*ph.shape) < ph).astype(float)
-            
+            h0 = (torch.rand_like(ph) < ph).float()
+
             # Negative phase
             pv1 = sortie_entree_RBM(rbm, h0)
-            v1 = (np.random.rand(*pv1.shape) < pv1).astype(float)
+            v1 = (torch.rand_like(pv1) < pv1).float()
             ph1 = entree_sortie_RBM(rbm, v1)
-            
-            # Updates
+
             m = batch.shape[0]
             rbm['W'] += lr * (batch.T @ ph - v1.T @ ph1) / m
-            rbm['a'] += lr * np.mean(batch - v1, axis=0)
-            rbm['b'] += lr * np.mean(ph - ph1, axis=0)
-        
-        recon = sortie_entree_RBM(rbm, entree_sortie_RBM(rbm, X))
-        mse = np.mean((X - recon) ** 2)
+            rbm['a'] += lr * (batch - v1).mean(dim=0)
+            rbm['b'] += lr * (ph - ph1).mean(dim=0)
+
+        recon = sortie_entree_RBM(rbm, entree_sortie_RBM(rbm, X.to(device)))
+        mse = ((X.to(device) - recon) ** 2).mean().item()
         print(f"Epoch {epoch+1}/{epochs} - MSE: {mse:.4f}")
     return rbm
 
 
 def generer_image_RBM(rbm, n_gibbs=1000, n_images=10):
     p = rbm['a'].shape[0]
-    v = (np.random.rand(n_images, p) < 0.5).astype(float)
+    v = (torch.rand(n_images, p, device=device) < 0.5).float()
     for _ in range(n_gibbs):
-        h = (np.random.rand(n_images, rbm['b'].shape[0]) < entree_sortie_RBM(rbm, v)).astype(float)
-        v = (np.random.rand(n_images, p) < sortie_entree_RBM(rbm, h)).astype(float)
-    return v
+        ph = entree_sortie_RBM(rbm, v)
+        h = (torch.rand_like(ph) < ph).float()
+        pv = sortie_entree_RBM(rbm, h)
+        v = (torch.rand_like(pv) < pv).float()
+    return v.cpu()
