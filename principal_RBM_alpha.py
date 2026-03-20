@@ -5,7 +5,7 @@ from data_utils import lire_alpha_digit
 from rbm import init_RBM, train_RBM, generer_image_RBM
 import os
 
-ALPHA_PATH = 'data/alpha/binaryalphadigs.mat'
+ALPHA_PATH = 'data/binaryalphadigs.mat'
 characters = [10, 11, 12]  # A, B, C
 n_hidden = 200
 epochs = 100

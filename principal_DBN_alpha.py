@@ -5,7 +5,7 @@ from data_utils import lire_alpha_digit
 from dbn import init_DBN, train_DBN, generer_image_DBN
 import os
 
-ALPHA_PATH = 'data/alpha/binaryalphadigs.mat'
+ALPHA_PATH = 'data/binaryalphadigs.mat'
 characters = [10, 11, 12]  # A, B, C
 layer_sizes = [320, 200, 100]
 epochs = 100
