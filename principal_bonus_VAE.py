@@ -1,12 +1,9 @@
 """
-Bonus: Generative model comparison on MNIST
-Trains and visually compares:
+Bonus: VAE on MNIST
+Train and compare between:
   1. RBM
   2. DBN  (2 layers)
   3. VAE  (Variational Autoencoder)
-
-All models use ~similar parameter counts for a fair comparison.
-Figures saved to outputs/bonus/
 """
 import matplotlib
 matplotlib.use('Agg')
@@ -27,7 +24,7 @@ os.makedirs(OUT_DIR, exist_ok=True)
 N_IMAGES    = 10
 N_GIBBS     = 500
 EPOCHS_RBM  = 100
-EPOCHS_VAE  = 30      # VAE converges fast
+EPOCHS_VAE  = 30      
 LR          = 0.001   # Adam LR for VAE
 BATCH_SIZE  = 128
 LATENT_DIM  = 64      # VAE latent space size
@@ -35,37 +32,28 @@ HIDDEN_DIM  = 256     # VAE encoder/decoder hidden size
 
 print(f"Device: {device}")
 
-# ── Load data (use subset for speed, full for best quality) ──
+# Load data (use subset for speed, full for best quality)  
 print("Loading MNIST...")
 X_train, _, X_test, _ = load_mnist(MNIST_DIR)
-# Use 10k for RBM/DBN training (keeps it fast), full for VAE
+# Use 10k for RBM/DBN training  and all for VAE
 X_rbm = X_train[:10000]
 print(f"  RBM/DBN training set: {X_rbm.shape}")
 print(f"  VAE training set:     {X_train.shape}")
 
-
-# ════════════════════════════════════════════
-# 1.  RBM
-# ════════════════════════════════════════════
-print("\n=== Training RBM ===")
+# 1. RBM
+print("\n Training RBM ")
 rbm = init_RBM(784, 256)
 rbm = train_RBM(rbm, X_rbm, epochs=EPOCHS_RBM, lr=0.1, batch_size=BATCH_SIZE)
 rbm_images = generer_image_RBM(rbm, n_gibbs=N_GIBBS, n_images=N_IMAGES)
 
-
-# ════════════════════════════════════════════
-# 2.  DBN  (2 layers: 784→256→128)
-# ════════════════════════════════════════════
-print("\n=== Training DBN ===")
+# 2. DBN (2 layers: 784->256->128)
+print("\n Training DBN ")
 dbn = init_DBN([784, 256, 128])
 dbn = train_DBN(dbn, X_rbm, epochs=EPOCHS_RBM, lr=0.1, batch_size=BATCH_SIZE)
 dbn_images = generer_image_DBN(dbn, n_gibbs=N_GIBBS, n_images=N_IMAGES)
 
-
-# ════════════════════════════════════════════
 # 3.  VAE
-# ════════════════════════════════════════════
-print("\n=== Training VAE ===")
+print("\n Training VAE ")
 
 class VAE(nn.Module):
     def __init__(self, input_dim=784, hidden_dim=HIDDEN_DIM, latent_dim=LATENT_DIM):
@@ -144,13 +132,9 @@ with torch.no_grad():
     # Binarize for fair visual comparison
     vae_images = (vae_samples > 0.5).float()
 
-# Also save the soft (non-binarized) outputs — look better visually
 vae_soft = vae_samples
 
-
-# ════════════════════════════════════════════
-# Save training curve for VAE
-# ════════════════════════════════════════════
+# Save training curve for VAE 
 plt.figure(figsize=(6, 4))
 plt.plot(range(1, EPOCHS_VAE + 1), train_losses, 'purple')
 plt.xlabel('Epoch')
@@ -162,9 +146,8 @@ plt.savefig(f'{OUT_DIR}/vae_training_loss.png', dpi=100)
 plt.close()
 
 
-# ════════════════════════════════════════════
+ 
 # Final comparison figure: RBM vs DBN vs VAE
-# ════════════════════════════════════════════
 fig, axes = plt.subplots(3, N_IMAGES, figsize=(N_IMAGES * 1.5, 5))
 model_names  = ['RBM', 'DBN (2 layers)', 'VAE']
 image_groups = [rbm_images, dbn_images, vae_soft]
@@ -185,10 +168,7 @@ plt.savefig(f'{OUT_DIR}/comparison_rbm_dbn_vae.png',
 plt.close()
 print(f"\nComparison figure saved: {OUT_DIR}/comparison_rbm_dbn_vae.png")
 
-
-# ════════════════════════════════════════════
-# Individual grids for each model
-# ════════════════════════════════════════════
+# Individual grids for each model 
 def save_grid(images, title, path, shape=(28, 28)):
     n = len(images)
     fig, axes = plt.subplots(1, n, figsize=(n * 1.5, 2))
@@ -210,9 +190,7 @@ save_grid(vae_images, 'VAE generated digits — binarized (MNIST)',
           f'{OUT_DIR}/vae_mnist_binary.png')
 
 
-# ════════════════════════════════════════════
 # VAE interpolation: latent space walk
-# ════════════════════════════════════════════
 # Pick two random points in latent space and interpolate
 print("\nGenerating VAE latent interpolation...")
 vae.eval()

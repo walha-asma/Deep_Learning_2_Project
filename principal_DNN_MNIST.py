@@ -45,7 +45,7 @@ def run_experiment(X_tr, Y_tr, X_te, Y_te, layer_sizes):
     )
 
 
-# --- Fig 1: Error vs number of layers (200 neurons/layer) ---
+# Fig 1: Error vs number of layers (200 neurons/layer)  
 print("\n=== Fig 1: layers ===")
 n_layers_list = [2, 3, 4, 5]
 res_layers = []
@@ -78,7 +78,7 @@ plt.legend(); plt.grid(True)
 plt.savefig('outputs/fig1_layers.png')
 print("Saved fig1_layers.png + loss curves")
 
-# --- Fig 2: Error vs neurons per layer (2 hidden layers) ---
+# Fig 2: Error vs neurons per layer (2 hidden layers)  
 print("\n=== Fig 2: neurons ===")
 neurons_list = [100, 200, 300, 500, 700]
 res_neurons = []
@@ -111,7 +111,7 @@ plt.legend(); plt.grid(True)
 plt.savefig('outputs/fig2_neurons.png')
 print("Saved fig2_neurons.png + loss curves")
 
-# --- Fig 3: Error vs training set size (2 layers x 200) ---
+# Fig 3: Error vs training set size (2 layers x 200)  
 print("\n=== Fig 3: data size ===")
 n_train_list = [1000, 3000, 7000, 10000, 30000, 60000]
 sizes = [input_dim, 200, 200, n_classes]

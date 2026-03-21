@@ -55,7 +55,6 @@ def retropropagation(dnn, X, Y, epochs=200, lr=0.1, batch_size=128):
                 db = delta.mean(dim=0)
 
                 if i > 0:
-                    # outputs[i] is the activation of layer i-1 (input to layer i)
                     delta = (delta @ dnn[i]['W'].T) * outputs[i] * (1 - outputs[i])
 
                 dnn[i]['W'] -= lr * dW

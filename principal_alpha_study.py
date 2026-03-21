@@ -1,12 +1,10 @@
 """
 AlphaDigits hyperparameter study.
-Covers the 4 analyses required by Section 4 of the assignment:
+Covers the 4 analyses:
   1. RBM — effect of number of hidden units
   2. RBM — effect of number of epochs
   3. RBM — effect of number of classes
   4. DBN — effect of depth (number of RBM layers)
-
-All figures saved to outputs/alpha_study/
 """
 import matplotlib
 matplotlib.use('Agg')
@@ -22,7 +20,7 @@ ALPHA_PATH = 'data/binaryalphadigs.mat'
 OUT_DIR    = 'outputs/alpha_study'
 os.makedirs(OUT_DIR, exist_ok=True)
 
-N_GIBBS   = 500   # Gibbs steps for generation (kept moderate to save time)
+N_GIBBS   = 500   
 N_IMAGES  = 5     # images to display per config
 BASE_LR   = 0.1
 BASE_BS   = 64
@@ -41,11 +39,6 @@ def save_image_grid(images, title, path, shape=(20, 16)):
     plt.close()
     print(f"  Saved {path}")
 
-
-# ─────────────────────────────────────────────
-# Helper: compute reconstruction MSE at epoch 0
-# (we just use a short train and read last MSE)
-# ─────────────────────────────────────────────
 def train_and_get_mse(rbm, X, epochs, lr, batch_size):
     """Returns (trained_rbm, final_mse)."""
     import torch
@@ -73,12 +66,10 @@ def train_and_get_mse(rbm, X, epochs, lr, batch_size):
     return rbm, final_mse
 
 
-# ══════════════════════════════════════════════
 # STUDY 1 — RBM: effect of hidden units
 # Characters: A, B, C  |  Epochs: 100
 # Hidden units: 50, 100, 200, 500
-# ══════════════════════════════════════════════
-print("\n=== Study 1: RBM hidden units ===")
+print("\n  Study 1: RBM hidden units  ")
 chars      = [10, 11, 12]   # A, B, C
 epochs_s1  = 100
 units_list = [50, 100, 200, 500]
@@ -109,12 +100,10 @@ plt.close()
 print("  Summary saved.")
 
 
-# ══════════════════════════════════════════════
 # STUDY 2 — RBM: effect of number of epochs
 # Characters: A, B, C  |  Hidden: 200
 # Epochs: 50, 100, 200, 500
-# ══════════════════════════════════════════════
-print("\n=== Study 2: RBM epochs ===")
+print("\n  Study 2: RBM epochs  ")
 epoch_list = [50, 100, 200, 500]
 mse_epochs = []
 
@@ -140,12 +129,10 @@ plt.close()
 print("  Summary saved.")
 
 
-# ══════════════════════════════════════════════
 # STUDY 3 — RBM: effect of number of classes
 # Hidden: 200  |  Epochs: 100
 # Classes: 1, 3, 6, 10
-# ══════════════════════════════════════════════
-print("\n=== Study 3: RBM number of classes ===")
+print("\n  Study 3: RBM number of classes  ")
 class_configs = [
     ([10],                        "1 class (A)"),
     ([10, 11, 12],                "3 classes (A,B,C)"),
@@ -180,12 +167,10 @@ plt.close()
 print("  Summary saved.")
 
 
-# ══════════════════════════════════════════════
 # STUDY 4 — DBN: effect of depth
 # Characters: A, B, C  |  Hidden: 200 per layer
 # Depths: 1, 2, 3, 4 RBM layers
-# ══════════════════════════════════════════════
-print("\n=== Study 4: DBN depth ===")
+print("\n  Study 4: DBN depth  ")
 X = lire_alpha_digit(ALPHA_PATH, [10, 11, 12])
 depth_configs = [
     [320, 200],
