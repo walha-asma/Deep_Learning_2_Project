@@ -35,6 +35,7 @@ def entree_sortie_reseau(dnn, X):
 def retropropagation(dnn, X, Y, epochs=200, lr=0.1, batch_size=128):
     X, Y = X.to(device), Y.to(device)
     n = X.shape[0]
+    loss_history = []
 
     for epoch in range(epochs):
         indices = torch.randperm(n)
@@ -54,17 +55,19 @@ def retropropagation(dnn, X, Y, epochs=200, lr=0.1, batch_size=128):
                 db = delta.mean(dim=0)
 
                 if i > 0:
+                    # outputs[i] is the activation of layer i-1 (input to layer i)
                     delta = (delta @ dnn[i]['W'].T) * outputs[i] * (1 - outputs[i])
 
                 dnn[i]['W'] -= lr * dW
                 dnn[i]['b'] -= lr * db
 
-        # Cross-entropy loss
+        # Cross-entropy loss after parameter update
         with torch.no_grad():
             probs = torch.clamp(entree_sortie_reseau(dnn, X)[-1], 1e-10, 1)
             ce = -(Y * torch.log(probs)).sum(dim=1).mean().item()
+        loss_history.append(ce)
         print(f"Epoch {epoch+1}/{epochs} - Cross-entropy: {ce:.4f}")
-    return dnn
+    return dnn, loss_history
 
 
 def test_DNN(dnn, X, Y):
