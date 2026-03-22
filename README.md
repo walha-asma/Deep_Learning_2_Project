@@ -1,6 +1,6 @@
 # Projet Deep Learning II — RBM, DBN, DNN & VAE
 
-**Institut Polytechnique de Paris — Yohan Petetin**
+**Institut Polytechnique de Paris — ENSTA Paris**
 
 Implémentation from scratch en PyTorch de Restricted Boltzmann Machines (RBM), Deep Belief Networks (DBN), Deep Neural Networks (DNN) pré-entraînés, et d'un Variational Autoencoder (VAE) pour la comparaison.
 
@@ -12,8 +12,7 @@ Implémentation from scratch en PyTorch de Restricted Boltzmann Machines (RBM), 
 TP_DNN/
 │
 ├── data/
-│   ├── alpha/
-│   │   └── binaryalphadigs.mat       ← Binary AlphaDigits dataset
+│   ├── binaryalphadigs.mat       ← Binary AlphaDigits dataset
 │   └── minst/
 │       ├── train-images-idx3-ubyte
 │       ├── train-labels-idx1-ubyte
@@ -71,7 +70,7 @@ Décompresser et placer dans `data/minst/`.
 
 ## Installation
 
-### Option 1 — Environnement virtuel dédié
+### Environnement virtuel dédié
 
 ```bash
 python3 -m venv venv
@@ -79,32 +78,24 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### Option 2 — Réutiliser un venv existant
-
-```bash
-source ~/path/to/existing/venv/bin/activate
-# Vérifier que torch, numpy, scipy, matplotlib sont disponibles
-python -c "import torch, numpy, scipy, matplotlib; print('OK')"
-```
-
 ---
 
 ## Exécution locale
 
 ```bash
-# Vérification rapide RBM sur AlphaDigits (~2 min)
+# Vérification rapide RBM sur AlphaDigits 
 python principal_RBM_alpha.py
 
-# Vérification rapide DBN sur AlphaDigits (~3 min)
+# Vérification rapide DBN sur AlphaDigits 
 python principal_DBN_alpha.py
 
-# Étude hyperparamètres AlphaDigits complète (~30 min GPU)
+# Étude hyperparamètres AlphaDigits complète 
 python principal_alpha_study.py
 
-# Étude DNN sur MNIST — figures principales (~2-4h CPU, ~1h GPU)
+# Étude DNN sur MNIST — figures principales 
 python principal_DNN_MNIST.py
 
-# Bonus VAE — comparaison RBM/DBN/VAE (~30 min GPU)
+# Bonus VAE — comparaison RBM/DBN/VAE 
 python principal_bonus_VAE.py
 ```
 
@@ -127,18 +118,6 @@ sbatch jobs/run_bonus_vae.sh
 squeue -u $USER
 tail -f jobs/logs/dnn_mnist_<JOB_ID>.out
 ```
-
-Partition utilisée : `ENSTA-l40s` (NVIDIA L40S, 48 GB VRAM).
-
-Temps estimés sur L40S :
-
-| Script | Temps estimé |
-|--------|-------------|
-| `run_rbm_alpha.sh` | ~5 min |
-| `run_dbn_alpha.sh` | ~10 min |
-| `run_alpha_study.sh` | ~35 min |
-| `run_dnn_mnist.sh` | ~2–3 h |
-| `run_bonus_vae.sh` | ~45 min |
 
 ---
 
